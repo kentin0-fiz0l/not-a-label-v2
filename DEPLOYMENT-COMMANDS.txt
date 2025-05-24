@@ -1,0 +1,58 @@
+# Quick Deployment Commands for Not a Label V2
+
+## Option 1: Deploy from GitHub (Recommended)
+
+SSH into your server and run:
+
+```bash
+# Download and run deployment script
+curl -fsSL https://raw.githubusercontent.com/kentin0-fiz0l/not-a-label-v2/main/server-deploy.sh -o deploy.sh
+chmod +x deploy.sh
+./deploy.sh
+```
+
+## Option 2: Manual Upload
+
+If you already uploaded deploy.tar.gz:
+
+```bash
+cd /root
+mkdir -p not-a-label-v2
+cd not-a-label-v2
+tar -xzf /root/deploy.tar.gz
+
+# Quick deploy
+npm install && npm run build && docker-compose up -d
+```
+
+## Important After Deployment:
+
+1. Edit .env file to add your API keys:
+   ```bash
+   nano /root/not-a-label-v2/.env
+   ```
+   Add your:
+   - OPENAI_API_KEY
+   - ANTHROPIC_API_KEY
+   - AWS credentials (if using)
+   - Email service keys
+
+2. Restart services after updating .env:
+   ```bash
+   cd /root/not-a-label-v2
+   docker-compose restart
+   ```
+
+3. Check if everything is running:
+   ```bash
+   docker-compose ps
+   docker-compose logs -f
+   ```
+
+## Test Your Site:
+
+1. Main website: https://www.not-a-label.art
+2. API health: https://api.not-a-label.art/health
+3. Login with test account:
+   - Email: demo@not-a-label.art
+   - Password: demo123456

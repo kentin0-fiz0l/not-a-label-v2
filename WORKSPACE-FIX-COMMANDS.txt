@@ -1,0 +1,102 @@
+# Fix Workspace Dependencies on DigitalOcean Server
+# Run these commands on the server as root
+
+# 1. Navigate to project root
+cd /root/not-a-label-v2
+
+# 2. Clean up all node_modules and lock files
+rm -rf node_modules package-lock.json
+rm -rf apps/web/node_modules apps/web/package-lock.json
+rm -rf packages/*/node_modules packages/*/package-lock.json
+rm -rf services/*/node_modules services/*/package-lock.json
+
+# 3. Install dependencies from root (this supports workspaces)
+npm install --legacy-peer-deps
+
+# 4. Build the web application
+npm run build --workspace=apps/web
+
+# 5. If the above fails, try building from root
+npm run build
+
+# 6. Create production directory
+mkdir -p /var/www/not-a-label
+
+# 7. Copy built files
+cp -r apps/web/.next /var/www/not-a-label/
+cp -r apps/web/public /var/www/not-a-label/
+cp apps/web/next.config.js /var/www/not-a-label/ 2>/dev/null || true
+
+# 8. Create standalone package.json for production
+cd /var/www/not-a-label
+cat > package.json << 'EOF'
+{
+  "name": "not-a-label-production",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "start": "NODE_ENV=production next start -p 3000"
+  },
+  "dependencies": {
+    "next": "15.3.2",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "next-auth": "4.24.5",
+    "next-themes": "0.2.1",
+    "@radix-ui/react-avatar": "1.0.4",
+    "@radix-ui/react-checkbox": "1.0.4",
+    "@radix-ui/react-dialog": "1.0.5",
+    "@radix-ui/react-dropdown-menu": "2.0.6",
+    "@radix-ui/react-icons": "1.3.0",
+    "@radix-ui/react-label": "2.0.2",
+    "@radix-ui/react-slot": "1.0.2",
+    "@radix-ui/react-tabs": "1.0.4",
+    "@radix-ui/react-scroll-area": "1.0.5",
+    "class-variance-authority": "0.7.0",
+    "clsx": "2.0.0",
+    "lucide-react": "0.294.0",
+    "react-hot-toast": "2.4.1",
+    "tailwind-merge": "2.1.0",
+    "tailwindcss-animate": "1.0.7"
+  }
+}
+EOF
+
+# 9. Install production dependencies
+npm install --production --legacy-peer-deps
+
+# 10. Copy environment file
+cp /root/not-a-label-v2/.env.production.server /var/www/not-a-label/.env.production
+
+# 11. Install PM2 globally
+npm install -g pm2
+
+# 12. Create PM2 config
+cat > ecosystem.config.js << 'EOF'
+module.exports = {
+  apps: [{
+    name: 'not-a-label',
+    script: 'npm',
+    args: 'start',
+    cwd: '/var/www/not-a-label',
+    env: {
+      NODE_ENV: 'production',
+      PORT: 3000
+    }
+  }]
+};
+EOF
+
+# 13. Start with PM2
+pm2 stop not-a-label 2>/dev/null || true
+pm2 delete not-a-label 2>/dev/null || true
+pm2 start ecosystem.config.js
+pm2 save
+pm2 startup systemd -u root --hp /root
+
+# 14. Check status
+pm2 status
+pm2 logs --lines 50
+
+# The app should now be running on port 3000
+# Access it via: http://146.190.205.102:3000 or https://www.not-a-label.art

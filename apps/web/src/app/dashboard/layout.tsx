@@ -16,22 +16,35 @@ import {
   Home,
   Upload,
   MessageSquare,
-  Globe
+  Globe,
+  Bell,
+  Search,
+  Command
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { UserMenu } from '@/components/user-menu';
+import { Breadcrumbs } from '@/components/breadcrumbs';
 import { cn } from '@/lib/utils';
 
 const navigation = [
   { name: 'Overview', href: '/dashboard', icon: Home },
   { name: 'Music', href: '/dashboard/music', icon: Music },
   { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
-  { name: 'AI Assistant', href: '/dashboard/ai', icon: Sparkles },
+  { name: 'AI Assistant', href: '/dashboard/ai', icon: Sparkles, badge: 'New' },
   { name: 'Distribution', href: '/dashboard/distribution', icon: Globe },
   { name: 'Community', href: '/dashboard/community', icon: Users },
   { name: 'Events', href: '/dashboard/events', icon: Calendar },
   { name: 'Revenue', href: '/dashboard/revenue', icon: DollarSign },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
+
+// Mock user data (in real app, this would come from session/auth)
+const mockUser = {
+  name: "Alex Morgan",
+  email: "alex@example.com",
+  image: null
+};
 
 export default function DashboardLayout({
   children,
@@ -52,7 +65,9 @@ export default function DashboardLayout({
         <div className="fixed left-0 top-0 bottom-0 w-64 bg-card border-r">
           <div className="flex h-16 items-center justify-between px-4">
             <Link href="/dashboard" className="flex items-center gap-2">
-              <Music className="h-6 w-6 text-primary" />
+              <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
+                <Music className="h-4 w-4 text-white" />
+              </div>
               <span className="font-semibold">Not a Label</span>
             </Link>
             <Button
@@ -74,7 +89,7 @@ export default function DashboardLayout({
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors mb-1',
                     isActive
                       ? 'bg-primary text-primary-foreground'
                       : 'hover:bg-accent hover:text-accent-foreground'
@@ -82,7 +97,12 @@ export default function DashboardLayout({
                   onClick={() => setSidebarOpen(false)}
                 >
                   <Icon className="h-4 w-4" />
-                  {item.name}
+                  <span className="flex-1">{item.name}</span>
+                  {item.badge && (
+                    <Badge variant="secondary" className="text-xs">
+                      {item.badge}
+                    </Badge>
+                  )}
                 </Link>
               );
             })}
@@ -95,7 +115,9 @@ export default function DashboardLayout({
         <div className="flex flex-col flex-1 bg-card border-r">
           <div className="flex h-16 items-center px-4">
             <Link href="/dashboard" className="flex items-center gap-2">
-              <Music className="h-6 w-6 text-primary" />
+              <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
+                <Music className="h-4 w-4 text-white" />
+              </div>
               <span className="font-semibold">Not a Label</span>
             </Link>
           </div>
@@ -117,13 +139,18 @@ export default function DashboardLayout({
                   )}
                 >
                   <Icon className="h-4 w-4" />
-                  {item.name}
+                  <span className="flex-1">{item.name}</span>
+                  {item.badge && (
+                    <Badge variant="secondary" className="text-xs">
+                      {item.badge}
+                    </Badge>
+                  )}
                 </Link>
               );
             })}
           </nav>
           <div className="p-4 border-t">
-            <Button variant="outline" className="w-full" asChild>
+            <Button className="w-full bg-gradient-primary hover:opacity-90 text-white" asChild>
               <Link href="/dashboard/music/upload">
                 <Upload className="h-4 w-4 mr-2" />
                 Upload Music
@@ -135,7 +162,7 @@ export default function DashboardLayout({
 
       {/* Main content */}
       <div className="flex-1 lg:pl-64">
-        <header className="sticky top-0 z-40 bg-background border-b">
+        <header className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
           <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
             <Button
               variant="ghost"
@@ -145,12 +172,44 @@ export default function DashboardLayout({
             >
               <Menu className="h-5 w-5" />
             </Button>
+            
+            {/* Breadcrumbs */}
+            <div className="hidden lg:block ml-4">
+              <Breadcrumbs />
+            </div>
+            
             <div className="flex-1" />
-            <div className="flex items-center gap-4">
+            
+            {/* Header actions */}
+            <div className="flex items-center gap-2">
+              {/* Search command */}
+              <Button
+                variant="outline"
+                className="hidden md:flex items-center gap-2 text-sm text-muted-foreground"
+                size="sm"
+              >
+                <Search className="h-4 w-4" />
+                Search...
+                <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+                  <Command className="h-3 w-3" />K
+                </kbd>
+              </Button>
+
+              {/* Notifications */}
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="h-5 w-5" />
+                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-xs text-white flex items-center justify-center">
+                  3
+                </span>
+              </Button>
+
+              {/* Messages */}
               <Button variant="ghost" size="icon">
                 <MessageSquare className="h-5 w-5" />
               </Button>
-              <div className="h-8 w-8 rounded-full bg-primary/10" />
+
+              {/* User menu */}
+              <UserMenu user={mockUser} />
             </div>
           </div>
         </header>

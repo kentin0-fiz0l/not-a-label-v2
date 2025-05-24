@@ -1,0 +1,38 @@
+# Stop any running processes and fix deployment
+
+# 1. Stop all PM2 processes
+pm2 stop all
+pm2 delete all
+pm2 kill
+
+# 2. Kill any Node.js processes
+pkill -f node
+pkill -f npm
+
+# 3. Check what's running on port 3000
+lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+
+# 4. Simple build approach - go to project root
+cd /root/not-a-label-v2
+
+# 5. Clean everything
+rm -rf node_modules package-lock.json
+find . -name "node_modules" -type d -exec rm -rf {} + 2>/dev/null || true
+find . -name "package-lock.json" -delete 2>/dev/null || true
+
+# 6. Install from root only
+npm install --legacy-peer-deps
+
+# 7. Check if build works
+npm run build --workspace=apps/web
+
+# 8. If that fails, try this alternative:
+cd apps/web
+npm install --legacy-peer-deps
+npm run build
+
+# 9. Start simple test
+npm start
+
+# If you need to completely start over, run:
+# cd /root && rm -rf not-a-label-v2 && git clone https://github.com/kentin0-fiz0l/not-a-label-v2.git
