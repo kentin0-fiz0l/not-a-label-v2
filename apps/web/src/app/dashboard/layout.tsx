@@ -26,6 +26,7 @@ import { Badge } from '@/components/ui/badge';
 import { UserMenu } from '@/components/user-menu';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { NotificationCenter } from '@/components/notification-center';
+import { GlobalSearch } from '@/components/global-search';
 import { cn } from '@/lib/utils';
 
 const navigation = [
@@ -183,18 +184,8 @@ export default function DashboardLayout({
             
             {/* Header actions */}
             <div className="flex items-center gap-2">
-              {/* Search command */}
-              <Button
-                variant="outline"
-                className="hidden md:flex items-center gap-2 text-sm text-muted-foreground"
-                size="sm"
-              >
-                <Search className="h-4 w-4" />
-                Search...
-                <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
-                  <Command className="h-3 w-3" />K
-                </kbd>
-              </Button>
+              {/* Global Search */}
+              <GlobalSearch />
 
               {/* Notifications */}
               <NotificationCenter />
