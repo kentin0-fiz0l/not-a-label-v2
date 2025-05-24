@@ -24,6 +24,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Link from 'next/link';
+import { RealtimeStats, LiveActivityFeed } from '@/components/realtime-stats';
 
 // Simulate user state (in real app, this would come from authentication/user context)
 const isNewUser = true; // Set to false to see the full dashboard
@@ -371,6 +372,14 @@ export default function DashboardPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Real-time Stats */}
+      {!isNewUser && (
+        <div className="grid gap-6 md:grid-cols-2 mt-6">
+          <RealtimeStats />
+          <LiveActivityFeed />
+        </div>
+      )}
 
       {/* Welcome Message for New Users */}
       {isNewUser && (

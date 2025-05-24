@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { UserMenu } from '@/components/user-menu';
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import { NotificationCenter } from '@/components/notification-center';
 import { cn } from '@/lib/utils';
 
 const navigation = [
@@ -196,12 +197,7 @@ export default function DashboardLayout({
               </Button>
 
               {/* Notifications */}
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-xs text-white flex items-center justify-center">
-                  3
-                </span>
-              </Button>
+              <NotificationCenter />
 
               {/* Messages */}
               <Button variant="ghost" size="icon">
