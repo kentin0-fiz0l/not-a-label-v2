@@ -1,0 +1,47 @@
+# Enhanced UX/UI Server Update Commands
+# Run these on your DigitalOcean server (root@146.190.205.102)
+
+# Method 1: Update from GitHub (Recommended)
+# ==========================================
+cd /root/not-a-label-standalone
+git remote -v
+git remote set-url origin https://github.com/kentin0-fiz0l/not-a-label-v2.git
+git fetch origin
+git checkout main
+git pull origin main
+npm run build
+pm2 restart not-a-label
+pm2 status
+
+# Method 2: Fresh deployment if needed
+# ====================================
+cd /root
+rm -rf not-a-label-standalone-backup
+mv not-a-label-standalone not-a-label-standalone-backup
+git clone https://github.com/kentin0-fiz0l/not-a-label-v2.git not-a-label-standalone
+cd not-a-label-standalone
+npm install --legacy-peer-deps
+npm run build
+cp ../not-a-label-standalone-backup/.env.production .
+pm2 stop not-a-label
+pm2 delete not-a-label
+pm2 start ecosystem.config.js
+pm2 save
+
+# Quick one-liner for updates:
+cd /root/not-a-label-standalone && git pull && npm run build && pm2 restart not-a-label
+
+# Check deployment:
+pm2 status
+pm2 logs --lines 20
+curl http://localhost:3000
+
+# Your enhanced platform features:
+# ✅ Multi-step onboarding wizard (/onboarding)
+# ✅ Enhanced authentication (/login, /forgot-password)  
+# ✅ Improved dashboard with empty states
+# ✅ User menu and breadcrumb navigation
+# ✅ Progress indicators and visual enhancements
+# ✅ New UI components (Progress, Stepper, Select, etc.)
+
+# Live at: https://www.not-a-label.art
