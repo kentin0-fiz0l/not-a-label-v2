@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AIConversation {
+  id          String        @id @default(uuid())
+  userId      String
+  title       String
+  type        String        // career, content, analysis
+  metadata    Json?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  messages    AIMessage[]
+  
+  @@index([userId])
+}
+
+model AIMessage {
+  id             String         @id @default(uuid())
+  conversationId String
+  role           String         // user, assistant, system
+  content        String
+  metadata       Json?
+  tokens         Int?
+  model          String?
+  createdAt      DateTime       @default(now())
+  
+  conversation   AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  @@index([conversationId])
+}
+
+model AIGeneration {
+  id          String    @id @default(uuid())
+  userId      String
+  type        String    // bio, social_post, press_release, etc
+  prompt      String
+  result      String
+  metadata    Json?
+  model       String
+  tokens      Int
+  createdAt   DateTime  @default(now())
+  
+  @@index([userId, type])
+}
+
+model AIAnalysis {
+  id          String    @id @default(uuid())
+  userId      String
+  trackId     String?
+  type        String    // track_analysis, market_analysis, trend_analysis
+  input       Json
+  result      Json
+  confidence  Float?
+  model       String
+  createdAt   DateTime  @default(now())
+  
+  @@index([userId, type])
+  @@index([trackId])
+}
