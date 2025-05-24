@@ -17,17 +17,20 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [termsError, setTermsError] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (!acceptTerms) {
-      setError('Please accept the terms and conditions');
+      setError('Please accept the terms and conditions to continue');
+      setTermsError(true);
       return;
     }
 
     setIsLoading(true);
     setError('');
+    setTermsError(false);
 
     const formData = new FormData(e.currentTarget);
     const data = {
@@ -139,25 +142,48 @@ export default function RegisterPage() {
                 ))}
               </div>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className={`flex items-start space-x-3 p-4 rounded-lg border bg-muted/50 ${termsError ? 'border-red-500 bg-red-50' : ''}`}>
               <Checkbox
                 id="terms"
                 checked={acceptTerms}
-                onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
+                onCheckedChange={(checked) => {
+                  console.log('Checkbox changed:', checked);
+                  setAcceptTerms(!!checked);
+                  if (checked) {
+                    setTermsError(false);
+                    setError('');
+                  }
+                }}
+                className="mt-0.5"
               />
-              <Label
-                htmlFor="terms"
-                className="text-sm font-normal cursor-pointer"
-              >
-                I agree to the{' '}
-                <Link href="/terms" className="text-primary hover:underline">
-                  Terms of Service
-                </Link>{' '}
-                and{' '}
-                <Link href="/privacy" className="text-primary hover:underline">
-                  Privacy Policy
-                </Link>
-              </Label>
+              <div className="flex-1">
+                <Label
+                  htmlFor="terms"
+                  className="text-sm font-normal cursor-pointer leading-relaxed"
+                >
+                  I agree to the{' '}
+                  <Link 
+                    href="/terms" 
+                    className="text-primary hover:underline font-medium"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Terms of Service
+                  </Link>{' '}
+                  and{' '}
+                  <Link 
+                    href="/privacy" 
+                    className="text-primary hover:underline font-medium"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Privacy Policy
+                  </Link>
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  By creating an account, you agree to our terms and privacy policy.
+                </p>
+              </div>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
