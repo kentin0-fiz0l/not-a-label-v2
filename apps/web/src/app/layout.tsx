@@ -1,7 +1,11 @@
+'use client';
+
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { useEffect } from 'react';
 import './globals.css';
 import { Providers } from '@/components/providers';
+import { PWAInstallPrompt } from '@/components/pwa/PWAInstallPrompt';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -57,10 +61,31 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  useEffect(() => {
+    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+      navigator.serviceWorker
+        .register('/sw.js')
+        .then((registration) => {
+          console.log('Service Worker registered with scope:', registration.scope);
+        })
+        .catch((error) => {
+          console.error('Service Worker registration failed:', error);
+        });
+    }
+  }, []);
+
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta name="theme-color" content="#000000" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Not a Label" />
+        <link rel="manifest" href="/manifest.json" />
+      </head>
       <body className={inter.variable}>
         <Providers>{children}</Providers>
+        <PWAInstallPrompt />
       </body>
     </html>
   );
