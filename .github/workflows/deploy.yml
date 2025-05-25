@@ -22,6 +22,9 @@ jobs:
           # Navigate to the application directory
           cd /opt/not-a-label
           
+          # Create pre-deployment snapshot
+          /opt/not-a-label/scripts/deployment-rollback.sh auto
+          
           # Pull latest changes
           git pull origin main
           
@@ -39,3 +42,13 @@ jobs:
           
           # Reload Nginx to ensure latest configuration
           sudo nginx -s reload
+          
+          # Health check
+          sleep 10
+          if ! curl -sf http://localhost:3000/api/health > /dev/null; then
+            echo "Health check failed - initiating rollback"
+            /opt/not-a-label/scripts/deployment-rollback.sh rollback $(ls -1dt /opt/not-a-label-rollback/deployment_* | head -2 | tail -1 | xargs basename)
+            exit 1
+          fi
+          
+          echo "Deployment successful!"
