@@ -2,7 +2,7 @@
 
 The all-in-one platform for independent artists. Distribute your music, grow your fanbase, and build a sustainable career with AI-powered insights.
 
-🌐 **Live Demo**: [https://www.not-a-label.art](https://www.not-a-label.art)
+🌐 **Live Demo**: [https://not-a-label.art](https://not-a-label.art)
 📦 **Repository**: [https://github.com/kentin0-fiz0l/not-a-label-v2](https://github.com/kentin0-fiz0l/not-a-label-v2)
 
 ## ✨ Key Features
