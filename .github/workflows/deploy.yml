@@ -1,0 +1,41 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Deploy to DigitalOcean
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          # Navigate to the application directory
+          cd /opt/not-a-label
+          
+          # Pull latest changes
+          git pull origin main
+          
+          # Install dependencies
+          npm install
+          
+          # Build the application
+          npm run build
+          
+          # Restart the application with PM2
+          pm2 restart not-a-label
+          
+          # Save PM2 configuration
+          pm2 save
+          
+          # Reload Nginx to ensure latest configuration
+          sudo nginx -s reload
